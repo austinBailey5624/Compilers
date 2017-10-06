@@ -1,0 +1,83 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.8.23)  29 SEP 2017 16:12
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**demo_april.tex
+(./demo_april.tex
+LaTeX2e <2016/02/01>
+Babel <3.9q> and hyphenation patterns for 3 language(s) loaded.
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/share/texlive/texmf-dist/tex/latex/base/fixltx2e.sty
+Package: fixltx2e 2015/06/22 v2.0b fixes to LaTeX (obsolete)
+
+
+Package fixltx2e Warning: fixltx2e is not required with releases after 2015
+(fixltx2e)                All fixes are now in the LaTeX kernel.
+(fixltx2e)                See the latexrelease package for details.
+
+)
+No file demo_april.aux.
+\openout1 = `demo_april.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+
+Underfull \hbox (badness 10000) in paragraph at lines 17--17
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 17--17
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 17--17
+
+ []
+
+! Undefined control sequence.
+l.18 \itemPosting
+                  Date: June 25\textsuperscript{th}, 2008 [EBook 11]
+? 
+! Emergency stop.
+l.18 \itemPosting
+                  Date: June 25\textsuperscript{th}, 2008 [EBook 11]
+End of file on the terminal!
+
+ 
+Here is how much of TeX's memory you used:
+ 209 strings out of 494953
+ 2353 string characters out of 6180977
+ 47777 words of memory out of 5000000
+ 3579 multiletter control sequences out of 15000+600000
+ 4851 words of font info for 18 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 22i,0n,19p,166b,72s stack positions out of 5000i,500n,10000p,200000b,80000s
+!  ==> Fatal error occurred, no output PDF file produced!
