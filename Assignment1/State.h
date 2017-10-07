@@ -10,11 +10,13 @@
 #define STATE_H
 
 #include <map>
+#include <vector>
 
 class State
 {
     public:
         State();
+        ~State();
 
         /*
         *   For a given identifier (of a state),
@@ -22,10 +24,13 @@ class State
         */
 //        std::map<int,bool> getTransfers(int identifier);
 
-        std::map<int,bool> getEpsilonClosure();
+        std::vector<int> getEpsilonClosure();
+        void addStates(char index, std::vector<int> transfers);
+
     private:
-        int identifier;
-        std::map<char, int> m_stateTransfers;
-        std::map<int,bool> m_epsilonClosure;
+        int m_id;
+        std::vector<std::vector<int>> m_transfers;
+        std::vector<int> m_epsilonClosure;
+
 };
 #endif

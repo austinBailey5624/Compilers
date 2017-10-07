@@ -7,13 +7,23 @@
 */
 #include "State.h"
 
+
 State::State()
 {
 
 }
 
-std::map<int,bool> State::getEpsilonClosure()
+State::~State()
 {
-    std::map<int,bool> result;
-    return result;
+
+}
+
+std::vector<int> State::getEpsilonClosure()
+{
+    return m_epsilonClosure;
+}
+
+void State::addStates(char index, std::vector<int> transfers)
+{
+    m_transfers.at(index) = transfers;
 }
