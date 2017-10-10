@@ -11,6 +11,7 @@
 
 #include <map>
 #include <vector>
+#include <iostream>
 
 class State
 {
@@ -23,9 +24,11 @@ class State
         *   return a map of all the states it can access
         */
 //        std::map<int,bool> getTransfers(int identifier);
-
+        void clear();
         std::vector<int> getEpsilonClosure();
-        void addStates(char index, std::vector<int> transfers);
+        void setEpsilonClosure(std::vector<int> epsilonClosure);
+        void addStates(std::vector<int> transfers);
+        std::vector<int> getStateTransfer(int whichInput);
 
     private:
         int m_id;
