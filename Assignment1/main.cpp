@@ -15,14 +15,6 @@
 #include <map>
 #include "State.h"
 
-
-std::vector<int> epsilonClosure(int currentState, std::vector<State*> states, std::map<int,bool> visited)
-{
-    std::vector<int> result;
-
-    return result;
-}
-
 /*
 *   This function is meant to combine sorted vectors while maintaining the
 *   uniqueness of the result vector. That is, all of the elements in the
@@ -61,6 +53,58 @@ std::vector<int> combineIntVectors(std::vector<int> first, std::vector<int> seco
         }
     }
     return result;
+}
+
+std::vector<int> fullEpsilonClosure(int currentState, std::vector<State*> states, std::map<int,bool> visited)
+{
+    std::vector<int> result;
+    if(visited[currentState])
+    {
+        return result;
+    }
+    visited[currentState]=true;
+
+    if(states.at(currentState)->getEpsilonClosure().empty())
+    {
+        return result;
+    }
+    result = states.at(currentState)->getEpsilonClosure();
+    for(int i=0; i<states.at(currentState)->getEpsilonClosure().size(); i++)
+    {
+        result = combineIntVectors(result, fullEpsilonClosure(states.at(currentState)->getEpsilonClosure().at(i),states,visited));
+    }
+    return result;
+}
+
+std::vector<int> sortedInsertIntoVector(int element, std::vector<int> myVector)
+{
+    if(myVector.empty())
+    {
+        myVector.push_back(element);
+        return myVector;
+    }
+    if(element<myVector.front())//if my element belongs in the front
+    {
+        std::vector<int> result;
+        result.push_back(element);
+        result.insert(result.end(),myVector.begin(),myVector.end());
+        return result;
+    }
+    if(element > myVector.back())//if my element belongs at the end
+    {
+        myVector.push_back(element);
+        return myVector;
+    }
+    for(int i=0; i<myVector.size()-1; i++)
+    {
+        if(element>myVector.at(i)&&element<myVector.at(i+1))
+        {
+            std::vector<int>::iterator myiterator = myVector.begin();
+            myVector.insert(myiterator+i+1,element);
+            return myVector;
+        }
+    }
+    return myVector;
 }
 
 bool elementIsInside(int element, std::vector<int> container)
@@ -176,6 +220,12 @@ std::vector<int> stringToVec(std::string str)
 
 int main()
 {
+
+std::vector<int> myVec = {1,2,3,4,6,7,8};
+printIntVector(sortedInsertIntoVector(5,myVec));
+
+
+
     int initialState;
     std::string read;
 //    std::cout << "Hello world\n";
@@ -386,10 +436,16 @@ int main()
         NFAStates.push_back(temp);
         temp->clear();
     }
+    //end parsing logic
 
 
 
+    std::map<int, bool> visitedLookup;
 
+    std::vector<int> eclosure = fullEpsilonClosure(initialState, NFAStates, visitedLookup);
+    std::cout << "E-closure(IO) = {";
+    printIntVector(eclosure);
+    std::cout << "} = 1";
     bool lcv = true;
     while(lcv)
     {
