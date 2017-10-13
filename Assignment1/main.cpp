@@ -15,6 +15,27 @@
 #include <map>
 #include "State.h"
 
+void printIntVector(std::vector<int> intVec)
+{
+    if(intVec.empty())
+    {
+        std::cout << "Vector is empty\n";
+        return;
+    }
+    for(unsigned int i=0; i<intVec.size(); i++)
+    {
+        if( (i+1)== intVec.size())
+        {
+            std::cout << intVec.at(i);
+        }
+        else
+        {
+            std::cout << intVec.at(i) << ", ";
+        }
+    }
+    std::cout << "\n";
+}
+
 /*
 *   This function is meant to combine sorted vectors while maintaining the
 *   uniqueness of the result vector. That is, all of the elements in the
@@ -60,18 +81,38 @@ std::vector<int> fullEpsilonClosure(int currentState, std::vector<State*> states
     std::vector<int> result;
     if(visited[currentState])
     {
+        std::cout << "State: " <<currentState << "Already Visited. Returning empty";
         return result;
     }
     visited[currentState]=true;
-
+    std::cout << "State: " << currentState << " Not vistied previously\n";
+    std::cout << "partial e closure of state " << currentState << " is : ";//currentState+1 since zero indexed
+    printIntVector(states.at(currentState)->getEpsilonClosure());
+    std::cout << "\n";
     if(states.at(currentState)->getEpsilonClosure().empty())
     {
         return result;
     }
-    result = states.at(currentState)->getEpsilonClosure();
-    for(int i=0; i<states.at(currentState)->getEpsilonClosure().size(); i++)
+    //if there's only one item in the immediate epsilon closure
+    if(states.at(currentState)->getEpsilonClosure().size()==1)
     {
+        //if that item is the zero placeholder,
+        result.push_back((currentState));//+1 for zero indexing
+        std::cout << "returning a size=1 epsilon closure\n";
+        return result;
+
+    }
+    result = states.at(currentState)->getEpsilonClosure();
+    std::cout << "computing the EpsilonClosure for all states in "<< currentState+1 <<"'s epsilon Closure\n";
+
+//    std::cout << "states.at(currentState)->getEpsilonClosure.Size(): " << states.at(currentState)->getEpsilonClosure().size() << " \n";
+    for(unsigned int i=0; i<states.at(currentState)->getEpsilonClosure().size(); i++)
+    {
+        std::cout << "states.at(currentState)eclosure at i="<<i << " is:" << states.at(currentState)->getEpsilonClosure().at(i) << " \n";
         result = combineIntVectors(result, fullEpsilonClosure(states.at(currentState)->getEpsilonClosure().at(i),states,visited));
+        std::cout << "Current Partial Result = ";
+        printIntVector(result);
+        std::cout << "\n";
     }
     return result;
 }
@@ -95,7 +136,7 @@ std::vector<int> sortedInsertIntoVector(int element, std::vector<int> myVector)
         myVector.push_back(element);
         return myVector;
     }
-    for(int i=0; i<myVector.size()-1; i++)
+    for(unsigned int i=0; i<myVector.size()-1; i++)
     {
         if(element>myVector.at(i)&&element<myVector.at(i+1))
         {
@@ -154,26 +195,7 @@ std::vector<int> computeFullEpsilonClosure(int whichState, std::vector<State*> S
 }
 */
 
-void printIntVector(std::vector<int> intVec)
-{
-    if(intVec.empty())
-    {
-        std::cout << "Vector is empty\n";
-        return;
-    }
-    for(unsigned int i=0; i<intVec.size(); i++)
-    {
-        if( (i+1)== intVec.size())
-        {
-            std::cout << intVec.at(i);
-        }
-        else
-        {
-            std::cout << intVec.at(i) << ", ";
-        }
-    }
-    std::cout << "\n";
-}
+
 
 void printCharVector(std::vector<char> charVec)
 {
@@ -221,8 +243,8 @@ std::vector<int> stringToVec(std::string str)
 int main()
 {
 
-std::vector<int> myVec = {1,2,3,4,6,7,8};
-printIntVector(sortedInsertIntoVector(5,myVec));
+//std::vector<int> myVec = {1,2,3,4,6,7,8};
+//printIntVector(sortedInsertIntoVector(5,myVec));
 
 
 
@@ -358,10 +380,10 @@ printIntVector(sortedInsertIntoVector(5,myVec));
     std::vector<State*> NFAStates;
 
     State* temp = new State();
-
+    std::vector<int> tempVec;
     std::vector<int> emptyVec;
-    emptyVec.push_back(0);
-//if a vector holding states is 0 that represents that it holds no states
+    emptyVec.push_back(-1);
+//if a vector holding states is -1 that represents that it holds no states
 
     for(int j=0; j<numOfNFAStates; j++)
     {
@@ -403,7 +425,14 @@ printIntVector(sortedInsertIntoVector(5,myVec));
             }
             else
             {
-                printIntVector(temp->getStateTransfer(i));
+                if(temp->getStateTransfer(i)==emptyVec)
+                {
+                    std::cout << "empty\n";
+                }
+                else
+                {
+                    printIntVector(temp->getStateTransfer(i));
+                }
             }
 //            std::cout << "\n";
         }
@@ -417,32 +446,46 @@ printIntVector(sortedInsertIntoVector(5,myVec));
 //            std::cout << "epsilonClosure read: ";
 //            printIntVector(stringToVec(read));
 //            std::cout << "\n";
-            temp->setEpsilonClosure(stringToVec(read));
+/*
+            if(stringToVec(read).size()==0)
+            {
+                std::vector<int> temp2;
+                temp2.push_back(j+1);
+                temp->setEpsilonClosure(temp2);
+            }
+            else
+            {
+*/
+            tempVec.push_back(j+1);
+            temp->setEpsilonClosure(combineIntVectors(stringToVec(read),tempVec));
+//            }
         }
         else//no epsilon Closure
         {
-            temp->setEpsilonClosure(emptyVec);
+            tempVec.push_back(j+1);
+            temp->setEpsilonClosure(tempVec);
         }
         std::cout << "state:" << (j+1) << " epsilonClosure:    ";
-        if(temp->getEpsilonClosure().at(0)==0)
+/*        if(temp->getEpsilonClosure().at(0)==-1)
         {
             std::cout << "empty\n";
         }
         else
-        {
+        {*/
             printIntVector(temp->getEpsilonClosure());
-        }
+//        }
         std::cout << "\n";
         NFAStates.push_back(temp);
-        temp->clear();
+        temp = new State();
+        tempVec.clear();
     }
     //end parsing logic
 
 
 
     std::map<int, bool> visitedLookup;
-
-    std::vector<int> eclosure = fullEpsilonClosure(initialState, NFAStates, visitedLookup);
+    std::cout << "Starting fullEpsilonClosure at initialState: " << initialState << "\n";
+    std::vector<int> eclosure = fullEpsilonClosure(initialState-1, NFAStates, visitedLookup);//-1 to go from one index to zero index
     std::cout << "E-closure(IO) = {";
     printIntVector(eclosure);
     std::cout << "} = 1";
