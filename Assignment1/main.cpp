@@ -15,6 +15,28 @@
 #include <map>
 #include "State.h"
 
+void printIntVectorNoReturn(std::vector<int> intvec)
+{
+    if(intvec.empty())
+    {
+        std::cout << "Vector is empty\n";
+        return;
+    }
+    for(unsigned int i=0; i<intvec.size(); i++)
+    {
+        if( (i+1)== intvec.size())
+        {
+            std::cout << intvec.at(i);        }
+        else
+        {
+            std::cout << intvec.at(i) << ", ";
+        }
+        //std::cout << "here?";
+    }
+    //std::cout << "not here?";
+    return;
+}
+
 void printIntVector(std::vector<int> intVec)
 {
     if(intVec.empty())
@@ -26,14 +48,16 @@ void printIntVector(std::vector<int> intVec)
     {
         if( (i+1)== intVec.size())
         {
-            std::cout << intVec.at(i);
-        }
+            std::cout << intVec.at(i);        }
         else
         {
             std::cout << intVec.at(i) << ", ";
         }
+        //std::cout << "here?";
     }
+    //std::cout << "not here?";
     std::cout << "\n";
+    return;
 }
 
 /*
@@ -108,12 +132,15 @@ std::vector<int> fullEpsilonClosure(int currentState, std::vector<State*> states
 //    std::cout << "states.at(currentState)->getEpsilonClosure.Size(): " << states.at(currentState)->getEpsilonClosure().size() << " \n";
     for(unsigned int i=0; i<states.at(currentState)->getEpsilonClosure().size(); i++)
     {
-        std::cout << "states.at(currentState)eclosure at i="<<i << " is:" << states.at(currentState)->getEpsilonClosure().at(i) << " \n";
+        std::cout << "states.at(currentState)eclosure at i="<<i << " is:" << states.at(currentState)->getEpsilonClosure().at(i) << std::endl;
         result = combineIntVectors(result, fullEpsilonClosure(states.at(currentState)->getEpsilonClosure().at(i),states,visited));
         std::cout << "Current Partial Result = ";
         printIntVector(result);
-        std::cout << "\n";
+        std::cout << std::endl;
     }
+    std::cout << "Final Result = ";
+    printIntVector(result);
+    std::cout << "do we get here?" << std::flush;
     return result;
 }
 
@@ -378,8 +405,9 @@ int main()
     std::cout << "num Of Inputs: " << numInputs << "\n";
     //std::cout << "charat0: " << read.at(0) << "\n";
     std::vector<State*> NFAStates;
-
     State* temp = new State();
+    State* blank = new State();
+    NFAStates.push_back(blank);//to go one-indexed
     std::vector<int> tempVec;
     std::vector<int> emptyVec;
     emptyVec.push_back(-1);
@@ -485,15 +513,18 @@ int main()
 
     std::map<int, bool> visitedLookup;
     std::cout << "Starting fullEpsilonClosure at initialState: " << initialState << "\n";
-    std::vector<int> eclosure = fullEpsilonClosure(initialState-1, NFAStates, visitedLookup);//-1 to go from one index to zero index
+    std::vector<int> eclosure;
+    eclosure = fullEpsilonClosure(initialState, NFAStates, visitedLookup);//-1 to go from one index to zero index
     std::cout << "E-closure(IO) = {";
-    printIntVector(eclosure);
-    std::cout << "} = 1";
-    bool lcv = true;
-    while(lcv)
-    {
+//    std::cout << "We got here right?\n";
+    printIntVectorNoReturn(eclosure);
+//    std::cout << "But not here?";
+    std::cout << "} = 1\n\n";
+    //bool lcv = true;
+    //while(lcv)
+    //{
 
-    }
+    //}
 
     return 0;
 }
