@@ -66,11 +66,11 @@ void printIntVector(std::vector<int> intVec)
     return;
 }
 
-int StateAlreadyUsed(std::vector<int> states, std::vector<DFAState> DFAvec)
+int stateAlreadyUsed(std::vector<int> states, std::vector<DFAState*> DFAvec)
 {
     for(unsigned int i = 1; i < DFAvec.size(); i++)
     {
-        if(DFAvec.at(i).getNFAStates() == states)
+        if(DFAvec.at(i)->getNFAStates() == states)
         {
             return i;
         }
@@ -120,17 +120,24 @@ std::vector<int> combineIntVectors(std::vector<int> first, std::vector<int> seco
 
 std::vector<int> fullEpsilonClosure(int currentState, std::vector<State*> states, std::map<int,bool> visited)
 {
+    bool debug = false;
     std::vector<int> result;
     if(visited[currentState])
     {
-        std::cout << "State: " <<currentState << "Already Visited. Returning empty";
+        if(debug)
+        {
+            std::cout << "State: " <<currentState << "Already Visited.  Returning empty";
+        }
         return result;
     }
     visited[currentState]=true;
-    std::cout << "State: " << currentState << " Not vistied previously\n";
-    std::cout << "partial e closure of state " << currentState << " is : ";//currentState+1 since zero indexed
-    printIntVector(states.at(currentState)->getEpsilonClosure());
-    std::cout << "\n";
+    if(debug)
+    {
+        std::cout << "State: " << currentState << " Not vistied previously\n";
+        std::cout << "partial e closure of state " << currentState << " is : ";//currentState+1 since zero indexed
+        printIntVector(states.at(currentState)->getEpsilonClosure());
+        std::cout << "\n";
+    }
     if(states.at(currentState)->getEpsilonClosure().empty())
     {
         return result;
@@ -140,25 +147,39 @@ std::vector<int> fullEpsilonClosure(int currentState, std::vector<State*> states
     {
         //if that item is the zero placeholder,
         result.push_back((currentState));//+1 for zero indexing
-        std::cout << "returning a size=1 epsilon closure\n";
+        if(debug)
+        {
+            std::cout << "returning a size=1 epsilon closure\n";
+        }
         return result;
 
     }
     result = states.at(currentState)->getEpsilonClosure();
-    std::cout << "computing the EpsilonClosure for all states in "<< currentState+1 <<"'s epsilon Closure\n";
-
+    if(debug)
+    {
+        std::cout << "computing the EpsilonClosure for all states in "<<    currentState+1 <<"'s epsilon Closure\n";
+    }
 //    std::cout << "states.at(currentState)->getEpsilonClosure.Size(): " << states.at(currentState)->getEpsilonClosure().size() << " \n";
     for(unsigned int i=0; i<states.at(currentState)->getEpsilonClosure().size(); i++)
     {
-        std::cout << "states.at(currentState)eclosure at i="<<i << " is:" << states.at(currentState)->getEpsilonClosure().at(i) << std::endl;
+        if(debug)
+        {
+            std::cout << "states.at(currentState)eclosure at i="<<i << " is:"   << states.at(currentState)->getEpsilonClosure().at(i) << std::endl;
+        }
         result = combineIntVectors(result, fullEpsilonClosure(states.at(currentState)->getEpsilonClosure().at(i),states,visited));
-        std::cout << "Current Partial Result = ";
-        printIntVector(result);
-        std::cout << std::endl;
+        if(debug)
+        {
+            std::cout << "Current Partial Result = ";
+            printIntVector(result);
+            std::cout << std::endl;
+        }
     }
-    std::cout << "Final Result = ";
-    printIntVector(result);
-    std::cout << "\n";
+    if(debug)
+    {
+        std::cout << "Final Result = ";
+        printIntVector(result);
+        std::cout << "\n";
+    }
 //    std::cout << "do we get here?" << std::flush;
     return result;
 }
@@ -205,43 +226,6 @@ bool elementIsInside(int element, std::vector<int> container)
     }
     return false;
 }
-/*
-std::vector<int> epsilonClosureHelper(int currentState, std::vector<State*> States, std::map<int,bool> visited)
-{
-    std::vector<int> result;
-    if(visited[currentState])//if we've already visited this state
-    {
-        return result;
-    }
-    //note: if the map looksup something that isnt there, it returns false
-}
-
-std::vector<int> computeFullEpsilonClosure(int whichState, std::vector<State*> States)
-{
-    std::vector<int> result;
-    if(States.at(whichState)->getEpsilonClosure().size()==0)
-    {
-        return result;
-    }
-
-    std::map<int, bool> visited;//records the states that we have visited
-    visited[whichState] = true;
-//    std::vector<int> tempState;
-    State* tempState;
-    for(int i=0; i< States.at(whichState)->getEpsilonClosure().size(); i++)
-    {
-        //temp state is the ith state in the epsilon Closure
-        tempState = States.at(States.at(whichState)->getEpsilonClosure().at(i));
-//        result.insert(result.end(), temp.begin(), temp.end());
-    }
-
-    std::sort(result.begin(), result.end());
-//    result = std::unique(result.begin(), result.end());
-    return result;
-}
-*/
-
-
 
 void printCharVector(std::vector<char> charVec)
 {
@@ -288,11 +272,7 @@ std::vector<int> stringToVec(std::string str)
 
 int main()
 {
-
-//std::vector<int> myVec = {1,2,3,4,6,7,8};
-//printIntVector(sortedInsertIntoVector(5,myVec));
-
-
+    bool debug = false;
 
     int initialState;
     std::string read;
@@ -311,6 +291,7 @@ int main()
     {
         std::cout << "Invalid Input, input must begin 'Initial State'\n";
         std::cout << "exiting\n";
+        return 0;
     }
 
     //initialState read logic
@@ -321,8 +302,10 @@ int main()
     read.erase(read.end()-1, read.end());
     //std::cout << "Pretty read: " << read << "\n";
     initialState = std::stoi(read);
-    std::cout << "InitialState: " << initialState << "\n";
-
+    if(debug)
+    {
+        std::cout << "InitialState: " << initialState << "\n";
+    }
     //finalStates read logic
     std::cin >> read;
     if(read.compare("Final") != 0)
@@ -372,9 +355,11 @@ int main()
         std::cout << "exiting\n";
         return 0;
     }
-    std::cout << "finalStates: ";
-    printIntVector(finalStates);
-
+    if(debug)
+    {
+        std::cout << "finalStates: ";
+        printIntVector(finalStates);
+    }
     std::cin >> read;
     if(read.compare("Total")!=0)
     {
@@ -401,15 +386,17 @@ int main()
         std::cout << "Exiting\n";
         return 0;
     }
-
-    std::cout << "Number of States:" << numOfNFAStates << "\n";
-
+    if(debug)
+    {
+        std::cout << "Number of States:" << numOfNFAStates << "\n";
+    }
     std::vector<char> stateInputs;
     std::cin >> read;
     if(read.compare("State")!=0)
     {
         std::cout << "Invalid input, expected fourth line to begin 'State'\n";
         std::cout << "Exiting\n";
+        return 0;
     }
     int numInputs = 0;
     std::cin >> read;
@@ -419,9 +406,12 @@ int main()
         std::cin >> read;
         numInputs++;
     }
-    std::cout << "StateInputs: ";
-    printCharVector(stateInputs);
-    std::cout << "num Of Inputs: " << numInputs << "\n";
+    if(debug)
+    {
+        std::cout << "StateInputs: ";
+        printCharVector(stateInputs);
+        std::cout << "num Of Inputs: " << numInputs << "\n";
+    }
     //std::cout << "charat0: " << read.at(0) << "\n";
     std::vector<State*> NFAStates;
     State* temp = new State();
@@ -465,23 +455,25 @@ int main()
             {
                 temp->addStates(emptyVec);
             }
-            std::cout << "state:" << (j+1) << " input:" << stateInputs.at(i) << " transfers: ";
-            if(temp->getStateTransfer(i).at(0)==0)
+            if(debug)
             {
-                std::cout << "none\n";
-            }
-            else
-            {
-                if(temp->getStateTransfer(i)==emptyVec)
+                std::cout << "state:" << (j+1) << " input:" << stateInputs.at(i) << " transfers: ";
+                if(temp->getStateTransfer(i).at(0)==0)
                 {
-                    std::cout << "empty\n";
+                    std::cout << "none\n";
                 }
                 else
                 {
-                    printIntVector(temp->getStateTransfer(i));
+                    if(temp->getStateTransfer(i)==emptyVec)
+                    {
+                        std::cout << "empty\n";
+                    }
+                    else
+                    {
+                        printIntVector(temp->getStateTransfer(i));
+                    }
                 }
             }
-//            std::cout << "\n";
         }
 
         std::cin >> read;//reads the epsilonClosure
@@ -499,17 +491,26 @@ int main()
             tempVec.push_back(j+1);
             temp->setEpsilonClosure(tempVec);
         }
-        std::cout << "state:" << (j+1) << " epsilonClosure:    ";
-        printIntVector(temp->getEpsilonClosure());
+        if(debug)
+        {
+            std::cout << "state:" << (j+1) << " epsilonTransitions:    ";
+            printIntVector(temp->getEpsilonClosure());
+        }
 
-        std::cout << "\n";
+        if(debug)
+        {
+            std::cout << "\n";
+        }
         NFAStates.push_back(temp);
         temp = new State();
         tempVec.clear();
     }
     //end parsing logic
     std::map<int, bool> visitedLookup;
-    std::cout << "Starting fullEpsilonClosure at initialState: " << initialState << "\n";
+    if(debug)
+    {
+        std::cout << "Starting fullEpsilonClosure at initialState: " <<     initialState << "\n";
+    }
     std::vector<int> eclosure;
 
     //std::map<int, DFAState*> stateHolder;
@@ -526,8 +527,7 @@ int main()
 //to fix off by one, now 1-index vector
     DFAState* current=new DFAState();
     DFAState* current2;
-    std::vector<int> somevec = {1,2,3};
-    current->setNFAStates(somevec);
+    current->setNFAStates(eclosure);
     DFAvec.push_back(current);
     stateQueue.emplace(current);
     std::map<char,DFAState*>* tempTransfers;
@@ -535,64 +535,125 @@ int main()
     std::vector<int> epsilonClosureSummation;
     int lastStateInQueue=1;
     int whichState = 1;
+    //debug = true;
     while(!stateQueue.empty())
     {
-        std::cout << "Mark " << whichState << "\n";
+        std::cout << "\nMark " << whichState << "\n";
         current = new DFAState();
-        std::cout << "imax = " << numInputs << "\n";
+        if(debug)
+        {
+            std::cout << "imax = " << numInputs << "\n";
+        }
         for(int i=0; i<numInputs; i++)
         {
-            std::cout << "i =" << i <<"\n";
-            printIntVectorBraces((stateQueue.front()->getNFAStates()));
-            std::cout << "jmax = " << stateQueue.front()->getNFAStates().size() << "\n";
+            if(debug)
+            {
+                std::cout << "i =" << i <<"\n";
+
+                std::cout << "jmax = " << stateQueue.front()->getNFAStates().size() << "\n";
+            }
+
+            result.clear();
+            //this loop calculates the result
             for(unsigned int j=0; j < stateQueue.front()->getNFAStates().size();j++)
             {
-                std::cout << "j = " << j <<"\n";
+                if(debug)
+                {
+                    std::cout << "j = " << j <<"\n";
+                }
                 if(NFAStates.at( stateQueue.front()->getNFAStates().at(j))->getStateTransfer(i).at(0)==-1)
                 {
-                    std::cout << "Combined Empty\n";
+                    if(debug)
+                    {
+                        std::cout << "Combined Empty\n";
+                    }
                 }
                 else
                 {
-                result = combineIntVectors(result,NFAStates.at( stateQueue.front()->getNFAStates().at(j))->getStateTransfer(i));
+                    if(debug)
+                    {
+                        std::cout << "Combined result: ";
+                        printIntVectorBraces(result);
+                        std::cout << "\nand front->getNFAStates.at(" << j <<"): ";
+                        printIntVectorBraces(NFAStates.at(stateQueue.front()->getNFAStates().at(j))->getStateTransfer(i));
+                        std::cout << "\n";
+                    }
+                    result = combineIntVectors(result,NFAStates.at( stateQueue.front()->getNFAStates().at(j))->getStateTransfer(i));
                 }
-                std::cout << "result = ";
-                printIntVectorBraces(result);
-                std::cout << "\n";
+                if(debug)
+                {
+                    std::cout << "result = ";
+                    printIntVectorBraces(result);
+                    std::cout << "\n";
+                }
             }
-            std::cout << "Exited J loop\n";
-            std::cout << "final result= ";
-            printIntVectorBraces(result);
+            if(debug)
+            {
+                std::cout << "Exited J loop\n";
+                std::cout << "final result= ";
+                printIntVectorBraces(result);
+            }
             //if result is empty
             if(result.empty()||result.at(0)==-1)
             {
-                std::cout<<"triggered empty if\n";
-                //do nothing
+                if(debug)
+                {
+                    std::cout<<"triggered empty if\n";
+                }//do nothing
             }
             else //if result is a new DFA, make it and add it to the Queue/Vector
             {
-                std::cout << "--" << stateInputs[i] << "--> ";
+                printIntVectorBraces((stateQueue.front()->getNFAStates()));
+                std::cout << " --" << stateInputs[i] << "--> ";
                 printIntVectorBraces(result);
                 current2 = new DFAState();
                 //combines the epsilon closures for every NFA state in result
-                for(unsigned int k = 0; k<result.size(); k++)
-                {
-                    //TODO: add full epsilonClosure;
-                    std::cout << "k: " << k << "\n";
+                //debug = true;
 
-                    combineIntVectors(epsilonClosureSummation, fullEpsilonClosure(result[k],NFAStates, visitedLookup));
-                    //combineIntVectors(epsilonClosureSummation, NFAStates.at(result[k])->getEpsilonClosure());
-                    std::cout << "union: ";
-                    printIntVectorBraces(epsilonClosureSummation);
-                    std::cout << "\n";
+                if(result.size()==1)
+                {
+                    visitedLookup.clear();
+                    epsilonClosureSummation = fullEpsilonClosure(result.at(0),NFAStates,visitedLookup);
+                }
+                else
+                {
+                    for(unsigned int k = 0; k<result.size(); k++)
+                    {
+                        //TODO: add full epsilonClosure;
+                        if(debug)
+                        {
+                            std::cout << "k: " << k << "\n";
+                        }
+                        visitedLookup.clear();
+                        if(debug)
+                        {
+                            std::cout << "epsilon " << result[k] << " =";
+                            printIntVector(NFAStates.at(result[k])->getEpsilonClosure());
+                            std::cout << "\n";
+                        }
+                        combineIntVectors(epsilonClosureSummation, fullEpsilonClosure(result[k],NFAStates, visitedLookup));
+                        //combineIntVectors(epsilonClosureSummation, NFAStates.at(result[k])->getEpsilonClosure());
+                        if(debug)
+                        {
+                            std::cout << "union: ";
+                            printIntVectorBraces(epsilonClosureSummation);
+                            std::cout << "\n";
+                        }
+                    }
                 }
                 lastStateInQueue++;
                 current2->setNFAStates(epsilonClosureSummation);
-                std::cout << "\n E-closure";
+                std::cout << "\nE-closure";
                 printIntVectorBraces(result);
                 std::cout << " = ";
                 printIntVectorBraces(epsilonClosureSummation);
                 std::cout << " = " << lastStateInQueue << "\n";
+                //stateQueue.push(current2);
+                if(stateAlreadyUsed(current2->getNFAStates(),DFAvec)==-1)
+                {
+                    stateQueue.push(current2);
+                    DFAvec.push_back(current2);
+                }
             }
 
         }
