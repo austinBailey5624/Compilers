@@ -1,9 +1,9 @@
 /**
-*   @file:          Main.cpp
+*   @file:          State.cpp
 *   @author:        Austin Bailey
 *   @date:          10/3/2017
 *   @Class:         Compilers
-*   @purpose:       Preforms an NFA to DFA conversion
+*   @purpose:       Represent NFA states
 */
 #include "State.h"
 #include <iostream>

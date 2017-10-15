@@ -13,15 +13,20 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <queue>
 #include "State.h"
+#include "DFAState.h"
 
-void printIntVectorNoReturn(std::vector<int> intvec)
+
+
+void printIntVectorBraces(std::vector<int> intvec)
 {
     if(intvec.empty())
     {
         std::cout << "Vector is empty\n";
         return;
     }
+    std::cout << "{";
     for(unsigned int i=0; i<intvec.size(); i++)
     {
         if( (i+1)== intvec.size())
@@ -34,6 +39,7 @@ void printIntVectorNoReturn(std::vector<int> intvec)
         //std::cout << "here?";
     }
     //std::cout << "not here?";
+    std::cout << "}";
     return;
 }
 
@@ -58,6 +64,18 @@ void printIntVector(std::vector<int> intVec)
     //std::cout << "not here?";
     std::cout << "\n";
     return;
+}
+
+int StateAlreadyUsed(std::vector<int> states, std::vector<DFAState> DFAvec)
+{
+    for(unsigned int i = 1; i < DFAvec.size(); i++)
+    {
+        if(DFAvec.at(i).getNFAStates() == states)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
 /*
@@ -140,7 +158,8 @@ std::vector<int> fullEpsilonClosure(int currentState, std::vector<State*> states
     }
     std::cout << "Final Result = ";
     printIntVector(result);
-    std::cout << "do we get here?" << std::flush;
+    std::cout << "\n";
+//    std::cout << "do we get here?" << std::flush;
     return result;
 }
 
@@ -466,27 +485,14 @@ int main()
         }
 
         std::cin >> read;//reads the epsilonClosure
-//        std::cout << "state:" << (j+1) << " epsilonClosure:" << read << "\n";
         if(read.length()!=2)
         {
             read.erase(read.begin(), read.begin()+1);//tears off beggining curly
             read.erase(read.end()-1, read.end());//tears off end curly
-//            std::cout << "epsilonClosure read: ";
-//            printIntVector(stringToVec(read));
-//            std::cout << "\n";
-/*
-            if(stringToVec(read).size()==0)
-            {
-                std::vector<int> temp2;
-                temp2.push_back(j+1);
-                temp->setEpsilonClosure(temp2);
-            }
-            else
-            {
-*/
+
             tempVec.push_back(j+1);
             temp->setEpsilonClosure(combineIntVectors(stringToVec(read),tempVec));
-//            }
+
         }
         else//no epsilon Closure
         {
@@ -494,37 +500,105 @@ int main()
             temp->setEpsilonClosure(tempVec);
         }
         std::cout << "state:" << (j+1) << " epsilonClosure:    ";
-/*        if(temp->getEpsilonClosure().at(0)==-1)
-        {
-            std::cout << "empty\n";
-        }
-        else
-        {*/
-            printIntVector(temp->getEpsilonClosure());
-//        }
+        printIntVector(temp->getEpsilonClosure());
+
         std::cout << "\n";
         NFAStates.push_back(temp);
         temp = new State();
         tempVec.clear();
     }
     //end parsing logic
-
-
-
     std::map<int, bool> visitedLookup;
     std::cout << "Starting fullEpsilonClosure at initialState: " << initialState << "\n";
     std::vector<int> eclosure;
-    eclosure = fullEpsilonClosure(initialState, NFAStates, visitedLookup);//-1 to go from one index to zero index
-    std::cout << "E-closure(IO) = {";
-//    std::cout << "We got here right?\n";
-    printIntVectorNoReturn(eclosure);
-//    std::cout << "But not here?";
-    std::cout << "} = 1\n\n";
-    //bool lcv = true;
-    //while(lcv)
-    //{
 
-    //}
+    //std::map<int, DFAState*> stateHolder;
+    std::vector<DFAState*> DFAvec;
+    std::queue<DFAState*> stateQueue;
+    DFAState* next;
+    std::vector<int> transitionHolder;
+    eclosure = fullEpsilonClosure(initialState, NFAStates, visitedLookup);//-1 to go from one index to zero index
+    std::cout << "E-closure(IO) = ";
+//    std::cout << "We got here right?\n";
+    printIntVectorBraces(eclosure);
+//    std::cout << "But not here?";
+    std::cout << " = 1\n\n";
+//to fix off by one, now 1-index vector
+    DFAState* current=new DFAState();
+    DFAState* current2;
+    std::vector<int> somevec = {1,2,3};
+    current->setNFAStates(somevec);
+    DFAvec.push_back(current);
+    stateQueue.emplace(current);
+    std::map<char,DFAState*>* tempTransfers;
+    std::vector<int> result;
+    std::vector<int> epsilonClosureSummation;
+    int lastStateInQueue=1;
+    int whichState = 1;
+    while(!stateQueue.empty())
+    {
+        std::cout << "Mark " << whichState << "\n";
+        current = new DFAState();
+        std::cout << "imax = " << numInputs << "\n";
+        for(int i=0; i<numInputs; i++)
+        {
+            std::cout << "i =" << i <<"\n";
+            printIntVectorBraces((stateQueue.front()->getNFAStates()));
+            std::cout << "jmax = " << stateQueue.front()->getNFAStates().size() << "\n";
+            for(unsigned int j=0; j < stateQueue.front()->getNFAStates().size();j++)
+            {
+                std::cout << "j = " << j <<"\n";
+                if(NFAStates.at( stateQueue.front()->getNFAStates().at(j))->getStateTransfer(i).at(0)==-1)
+                {
+                    std::cout << "Combined Empty\n";
+                }
+                else
+                {
+                result = combineIntVectors(result,NFAStates.at( stateQueue.front()->getNFAStates().at(j))->getStateTransfer(i));
+                }
+                std::cout << "result = ";
+                printIntVectorBraces(result);
+                std::cout << "\n";
+            }
+            std::cout << "Exited J loop\n";
+            std::cout << "final result= ";
+            printIntVectorBraces(result);
+            //if result is empty
+            if(result.empty()||result.at(0)==-1)
+            {
+                std::cout<<"triggered empty if\n";
+                //do nothing
+            }
+            else //if result is a new DFA, make it and add it to the Queue/Vector
+            {
+                std::cout << "--" << stateInputs[i] << "--> ";
+                printIntVectorBraces(result);
+                current2 = new DFAState();
+                //combines the epsilon closures for every NFA state in result
+                for(unsigned int k = 0; k<result.size(); k++)
+                {
+                    //TODO: add full epsilonClosure;
+                    std::cout << "k: " << k << "\n";
+
+                    combineIntVectors(epsilonClosureSummation, fullEpsilonClosure(result[k],NFAStates, visitedLookup));
+                    //combineIntVectors(epsilonClosureSummation, NFAStates.at(result[k])->getEpsilonClosure());
+                    std::cout << "union: ";
+                    printIntVectorBraces(epsilonClosureSummation);
+                    std::cout << "\n";
+                }
+                lastStateInQueue++;
+                current2->setNFAStates(epsilonClosureSummation);
+                std::cout << "\n E-closure";
+                printIntVectorBraces(result);
+                std::cout << " = ";
+                printIntVectorBraces(epsilonClosureSummation);
+                std::cout << " = " << lastStateInQueue << "\n";
+            }
+
+        }
+        whichState++;
+        stateQueue.pop();
+    }
 
     return 0;
 }
